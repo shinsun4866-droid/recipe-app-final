@@ -16,7 +16,7 @@ YOUR_API_KEY = "여기에_1단계에서_새로_발급받은_API_키를_붙여넣
 # --- API 키 설정 ---
 try:
     # 변수에 저장된 키를 사용하여 직접 연결을 시도합니다.
-    genai.configure(api_key=YOUR_API_KEY)
+    genai.configure(api_key=AIzaSyAPmQqgcDaNs_AiNJCGdpDEdjpgDR6TF1w)
 except Exception as e:
     st.error("API 키 설정에 실패했습니다. 키를 정확히 복사했는지 확인해주세요.")
     st.stop()
