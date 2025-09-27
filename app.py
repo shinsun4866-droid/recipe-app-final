@@ -11,7 +11,7 @@ import io
 
 # --- 1. 여기에 당신의 '새로 발급받은' API 키를 붙여넣으세요 ---
 # st.secrets를 사용하지 않고, 키를 변수에 직접 할당합니다.
-YOUR_API_KEY = "AIzaSyAPmQqgcDaNs_AiNJCGdpDEdjpgDR6TF1w"
+YOUR_API_KEY = "AIzaSyB0oQnaNZj91pVWeMom3mN__KOCnr0zu-Q"
 
 # --- API 키 설정 ---
 try:
