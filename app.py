@@ -11,12 +11,12 @@ import io
 
 # --- 1. 여기에 당신의 '새로 발급받은' API 키를 붙여넣으세요 ---
 # st.secrets를 사용하지 않고, 키를 변수에 직접 할당합니다.
-YOUR_API_KEY = "여기에_1단계에서_새로_발급받은_API_키를_붙여넣으세요"
+YOUR_API_KEY = "AIzaSyAPmQqgcDaNs_AiNJCGdpDEdjpgDR6TF1w"
 
 # --- API 키 설정 ---
 try:
     # 변수에 저장된 키를 사용하여 직접 연결을 시도합니다.
-    genai.configure(api_key=AIzaSyAPmQqgcDaNs_AiNJCGdpDEdjpgDR6TF1w)
+    genai.configure(api_key=YOUR_API_KEY)
 except Exception as e:
     st.error("API 키 설정에 실패했습니다. 키를 정확히 복사했는지 확인해주세요.")
     st.stop()
@@ -100,3 +100,4 @@ if st.button("냉장고를 비워보자! 🍽️"):
                 st.code(full_recipe_text_for_copy.strip(), language=None)
     else:
         st.warning("재료를 먼저 입력해주세요!")
+
