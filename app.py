@@ -15,7 +15,7 @@ except Exception as e:
     st.error("API 키 설정에 실패했습니다. Streamlit Secrets에 API 키를 정확히 설정했는지 확인해주세요.")
     st.stop()
     
-# --- AI 모델을 가장 안정적인 'gemini-pro'로 변경 ---
+# --- ✨ AI 모델을 가장 안정적인 'gemini-pro'로 변경 ---
 # 이 모델은 텍스트 생성에 매우 안정적입니다.
 try:
     text_model = genai.GenerativeModel('gemini-pro')
@@ -102,5 +102,4 @@ if st.button("냉장고를 비워보자! 🍽️"):
                 st.code(full_recipe_text_for_copy.strip(), language=None)
     else:
         st.warning("재료를 먼저 입력해주세요!")
-
 
