@@ -8,19 +8,26 @@ import io
 # --- 기본 설정 ---
 st.set_page_config(page_title="오늘 뭐 먹지? (냉장고 비우기)", page_icon="🥗")
 
-# --- API 키 설정 (안전한 방식으로 복구) ---
+# --- API 키 설정 ---
 try:
-    # 스트림릿의 안전한 비밀금고(Secrets)를 통해 키를 가져옵니다.
     genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 except Exception as e:
-    st.error("API 키 설정에 실패했습니다. Streamlit Secrets에 '새로운' API 키를 정확히 설정했는지 확인해주세요.")
+    st.error("API 키 설정에 실패했습니다. Streamlit Secrets에 API 키를 정확히 설정했는지 확인해주세요.")
     st.stop()
     
-# --- AI 모델 설정 및 프롬프트 ---
-text_model = genai.GenerativeModel('gemini-1.5-flash')
-image_model = genai.GenerativeModel('gemini-1.5-flash')
+# --- ✨ 수정된 부분: AI 모델을 가장 안정적인 버전으로 변경 ---
+# text_model = genai.GenerativeModel('gemini-1.5-flash')
+# image_model = genai.GenerativeModel('gemini-1.5-flash')
+# 위 두 줄을 아래의 안정적인 'gemini-pro' 모델로 교체합니다.
+# 이미지 생성 기능이 없으므로, 이미지 생성 모델은 주석 처리합니다.
+try:
+    text_model = genai.GenerativeModel('gemini-pro')
+    # image_model = genai.GenerativeModel('gemini-pro-vision') # gemini-pro는 이미지 생성을 지원하지 않습니다.
+except Exception as e:
+    st.error(f"AI 모델을 불러오는 데 실패했습니다: {e}")
+    st.stop()
 
-# 이하 코드는 이전과 동일합니다.
+# (이하 프롬프트는 동일합니다)
 prompt_template = """
 당신은 '금복상회'의 수석 셰프로, 냉장고 속 재료로 만들 수 있는 요리를 추천하는 전문가입니다. 아래 규칙을 반드시 준수하여 답변해야 합니다.
 ### **'치품송' 특별 취급 규칙 (가장 중요!)**
@@ -44,21 +51,14 @@ prompt_template = """
 2. (조리법 2)
 3. (이하 생략)
 """
+# 'gemini-pro'는 이미지 생성을 지원하지 않으므로, 이미지 생성 함수는 잠시 비활성화합니다.
 def generate_recipe_image(recipe_name):
-    try:
-        image_prompt = f"A realistic and delicious photo of '{recipe_name}', minimalist style, bright background"
-        response = image_model.generate_content(image_prompt, generation_config={"candidate_count": 1})
-        if response.parts:
-            img_part = response.parts[0]
-            if 'image' in img_part._resource.content_type:
-                img_bytes = img_part.inline_data.data
-                return Image.open(io.BytesIO(img_bytes))
-    except Exception as e:
-        print(f"이미지 생성 오류: {e}")
     return None
+
+# (이하 UI 코드는 동일합니다)
 st.title("🥗 오늘 뭐 먹지? (냉장고 비우기)")
 smart_store_url = "https://smartstore.naver.com/shinseonsa"
-image_url = "https://raw.githubusercontent.com/shinsun4s866-droid/cheepoom/main/choopoom.jpg" 
+image_url = "https://raw.githubusercontent.com/shinsun4866-droid/cheepoom/main/choopoom.jpg" 
 st.markdown(f"""
 <a href="{smart_store_url}" target="_blank" title="치품송 구매 페이지로 이동">
     <img src="{image_url}" alt="치품송 구매하러 가기" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
