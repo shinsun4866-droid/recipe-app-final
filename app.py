@@ -5,20 +5,15 @@ import re
 from PIL import Image
 import io
 
-# --- ☢️ 경고: 이것은 테스트용 코드입니다! ---
-# 이 테스트는 문제의 원인을 찾기 위해 API 키를 코드에 직접 입력합니다.
-# 테스트가 끝나면 반드시 이전 버전의 코드로 되돌려야 합니다.
+# --- 기본 설정 ---
+st.set_page_config(page_title="오늘 뭐 먹지? (냉장고 비우기)", page_icon="🥗")
 
-# --- 1. 여기에 당신의 '새로 발급받은' API 키를 붙여넣으세요 ---
-# st.secrets를 사용하지 않고, 키를 변수에 직접 할당합니다.
-YOUR_API_KEY = "AIzaSyB0oQnaNZj91pVWeMom3mN__KOCnr0zu-Q"
-
-# --- API 키 설정 ---
+# --- API 키 설정 (안전한 방식으로 복구) ---
 try:
-    # 변수에 저장된 키를 사용하여 직접 연결을 시도합니다.
-    genai.configure(api_key=YOUR_API_KEY)
+    # 스트림릿의 안전한 비밀금고(Secrets)를 통해 키를 가져옵니다.
+    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 except Exception as e:
-    st.error("API 키 설정에 실패했습니다. 키를 정확히 복사했는지 확인해주세요.")
+    st.error("API 키 설정에 실패했습니다. Streamlit Secrets에 '새로운' API 키를 정확히 설정했는지 확인해주세요.")
     st.stop()
     
 # --- AI 모델 설정 및 프롬프트 ---
@@ -63,7 +58,7 @@ def generate_recipe_image(recipe_name):
     return None
 st.title("🥗 오늘 뭐 먹지? (냉장고 비우기)")
 smart_store_url = "https://smartstore.naver.com/shinseonsa"
-image_url = "https://raw.githubusercontent.com/shinsun4866-droid/cheepoom/main/choopoom.jpg" 
+image_url = "https://raw.githubusercontent.com/shinsun4s866-droid/cheepoom/main/choopoom.jpg" 
 st.markdown(f"""
 <a href="{smart_store_url}" target="_blank" title="치품송 구매 페이지로 이동">
     <img src="{image_url}" alt="치품송 구매하러 가기" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
