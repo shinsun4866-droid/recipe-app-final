@@ -15,19 +15,15 @@ except Exception as e:
     st.error("API 키 설정에 실패했습니다. Streamlit Secrets에 API 키를 정확히 설정했는지 확인해주세요.")
     st.stop()
     
-# --- ✨ 수정된 부분: AI 모델을 가장 안정적인 버전으로 변경 ---
-# text_model = genai.GenerativeModel('gemini-1.5-flash')
-# image_model = genai.GenerativeModel('gemini-1.5-flash')
-# 위 두 줄을 아래의 안정적인 'gemini-pro' 모델로 교체합니다.
-# 이미지 생성 기능이 없으므로, 이미지 생성 모델은 주석 처리합니다.
+# --- AI 모델을 가장 안정적인 'gemini-pro'로 변경 ---
+# 이 모델은 텍스트 생성에 매우 안정적입니다.
 try:
     text_model = genai.GenerativeModel('gemini-pro')
-    # image_model = genai.GenerativeModel('gemini-pro-vision') # gemini-pro는 이미지 생성을 지원하지 않습니다.
 except Exception as e:
     st.error(f"AI 모델을 불러오는 데 실패했습니다: {e}")
     st.stop()
 
-# (이하 프롬프트는 동일합니다)
+# --- 프롬프트 템플릿 (이전과 동일) ---
 prompt_template = """
 당신은 '금복상회'의 수석 셰프로, 냉장고 속 재료로 만들 수 있는 요리를 추천하는 전문가입니다. 아래 규칙을 반드시 준수하여 답변해야 합니다.
 ### **'치품송' 특별 취급 규칙 (가장 중요!)**
@@ -51,48 +47,60 @@ prompt_template = """
 2. (조리법 2)
 3. (이하 생략)
 """
-# 'gemini-pro'는 이미지 생성을 지원하지 않으므로, 이미지 생성 함수는 잠시 비활성화합니다.
-def generate_recipe_image(recipe_name):
-    return None
 
-# (이하 UI 코드는 동일합니다)
-st.title("🥗 오늘 뭐 먹지? (냉장고 비우기)")
+# --- 웹 앱 UI 구성 ---
+
+# 스마트스토어 및 이미지 주소
 smart_store_url = "https://smartstore.naver.com/shinseonsa"
-image_url = "https://raw.githubusercontent.com/shinsun4866-droid/cheepoom/main/choopoom.jpg" 
+# GitHub에 업로드된 choopoom.jpg 이미지의 실제 Raw 주소를 사용합니다.
+image_url = "https://raw.githubusercontent.com/shinsun4866-droid/recipe-app-final/main/choopoom.jpg" 
+
+# 클릭 가능한 이미지
 st.markdown(f"""
 <a href="{smart_store_url}" target="_blank" title="치품송 구매 페이지로 이동">
     <img src="{image_url}" alt="치품송 구매하러 가기" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
 </a>
 """, unsafe_allow_html=True)
 st.caption("▲ 이미지를 클릭하면 구매 페이지로 이동합니다.")
+
+# 제목 및 부제목
+st.title("🥗 오늘 뭐 먹지? (냉장고 비우기)")
 st.markdown("<h4>🌱 남김없는 음식물 비우기 프로젝트</h4>", unsafe_allow_html=True)
 st.markdown("---")
+
+# 앱 설명 및 재료 입력
 st.write("냉장고에 있는 재료만으로 금복상회 치품송 수석 셰프가 맛있는 요리를 추천해 드립니다!")
 ingredients_input = st.text_area("가지고 계신 재료를 쉼표(,)나 줄바꿈으로 구분해서 모두 입력해주세요.", placeholder="예: 치품송, 파프리카, 양파, 계란, 올리브유")
+
+# 레시피 생성 버튼
 if st.button("냉장고를 비워보자! 🍽️"):
     if ingredients_input:
         with st.spinner("금복상회 수석 셰프가 레시피를 구상 중입니다... 🧑‍🍳"):
             full_prompt = prompt_template + "\n**입력 재료:** " + ingredients_input
+            # 텍스트 모델을 사용하여 콘텐츠를 생성합니다.
             response = text_model.generate_content(full_prompt)
             recipes = response.text.strip().split('---')
             full_recipe_text_for_copy = ""
+
             st.markdown("---")
             st.subheader("✨ 금복상회 치품송 수석 셰프 추천요리 ✨")
+
+            # 레시피 표시
             for recipe_str in recipes:
                 if "요리 이름:" in recipe_str:
                     clean_recipe_str = recipe_str.strip()
                     full_recipe_text_for_copy += clean_recipe_str + "\n\n---\n\n"
-                    match = re.search(r"요리 이름:\s*(.*)", clean_recipe_str)
-                    recipe_name = match.group(1).strip() if match else "요리"
+                    
                     with st.container(border=True):
-                        recipe_image = generate_recipe_image(recipe_name)
-                        if recipe_image:
-                            st.image(recipe_image, caption=f"AI가 생성한 '{recipe_name}' 이미지", use_column_width=True)
+                        # AI 레시피 이미지 생성 기능은 gemini-pro 모델에서 지원하지 않으므로 비활성화합니다.
                         st.markdown(clean_recipe_str)
+            
+            # 복사 상자
             if full_recipe_text_for_copy:
                 st.markdown("---")
                 st.info("📋 아래 상자 안의 텍스트를 복사해서 공유하세요!")
                 st.code(full_recipe_text_for_copy.strip(), language=None)
     else:
         st.warning("재료를 먼저 입력해주세요!")
+
 
